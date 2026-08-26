@@ -1,0 +1,12 @@
+name: 'analytics'
+version: '1.0.0'
+profile: 'analytics'
+
+model-paths: ["models"]
+
+models:
+  analytics:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: mart_model_cost_daily
+    description: "Daily cost and token usage per model. Cost via token_cost macro."
+    columns:
+      - name: usage_date
+        data_tests: [not_null]
+      - name: model_name
+        data_tests: [not_null]
+      - name: total_cost_usd
+        description: "Daily USD cost; cached input discounted (see token_cost macro)."
+
+  - name: mart_usage_daily
+    description: "Daily engagement by channel, department, country, plan."
+    columns:
+      - name: usage_date
+        data_tests: [not_null]
+
+  - name: mart_feedback_by_model_daily
+    description: "Daily thumbs-up satisfaction rate per model."
+    columns:
+      - name: satisfaction_rate
+        description: "thumbs_up / total feedback, 0–1."
+
+  - name: mart_assistant_summary
+    description: "Per-assistant volume and satisfaction. Cost not attributable (usage lacks assistant join path)."
+    columns:
+      - name: assistant_name
+        data_tests: [not_null]
+
+  - name: mart_cost_by_plan_daily
+    description: "Daily cost-to-serve by plan tier and department."
+    columns:
+      - name: usage_date
+        data_tests: [not_null]

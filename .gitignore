@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/

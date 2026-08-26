@@ -23,3 +23,17 @@ ps:
 # Open a psql shell against the running database.
 psql:
 	docker compose exec postgres psql -U postgres -d postgres
+
+### Additions below
+
+# Run dbt models.
+dbt-run:
+	docker compose exec dbt dbt run
+
+# Open psql against the warehouse.
+psql-warehouse:
+	docker compose exec warehouse psql -U postgres -d warehouse
+
+# Open Metabase.
+metabase:
+	open http://localhost:3000

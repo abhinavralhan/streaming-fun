@@ -1,0 +1,62 @@
+
+services:
+  warehouse:
+    image: postgres:16
+    command: postgres -c wal_level=logical
+    environment:
+      POSTGRES_DB: warehouse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    ports:
+      - "5433:5432"
+    volumes:
+      - warehouse_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d warehouse"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  warehouse-init:
+    image: postgres:16
+    depends_on:
+      postgres: { condition: service_healthy }
+      warehouse: { condition: service_healthy }
+      seed: { condition: service_completed_successfully }
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - ./warehouse:/init:ro
+    entrypoint: ["bash", "/init/init.sh"]
+    restart: "no"
+
+  dbt:
+    build: ./dbt
+    depends_on:
+      warehouse-init: { condition: service_completed_successfully }
+    working_dir: /usr/app
+    volumes:
+      - ./dbt:/usr/app
+      - ./dbt:/root/.dbt
+    environment:
+      WAREHOUSE_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+
+    entrypoint: ["bash", "-c", "dbt run && tail -f /dev/null"]
+
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      warehouse: { condition: service_healthy }
+      warehouse-init: { condition: service_completed_successfully }
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: postgres
+      MB_DB_PASS: ${POSTGRES_PASSWORD:-secret}
+      MB_DB_HOST: warehouse
+
+volumes:
+  warehouse_data:

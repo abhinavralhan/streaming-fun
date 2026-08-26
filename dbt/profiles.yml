@@ -1,0 +1,12 @@
+analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: warehouse
+      port: 5432
+      dbname: warehouse
+      user: postgres
+      password: secret
+      schema: analytics
+      threads: 4

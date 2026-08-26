@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: stg_messages
+    description: "Cleaned, deduplicated messages — one row per message. Fact table."
+    columns:
+      - name: id
+        description: "Message primary key."
+        data_tests:
+          - unique
+          - not_null
+      - name: conversation_id
+        description: "Parent conversation."
+        data_tests:
+          - not_null
+      - name: user_id
+        data_tests:
+          - not_null
+      - name: model_id
+        data_tests:
+          - not_null
+      - name: type
+        description: "prompt / answer / reasoning / text / tool."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['prompt', 'answer', 'reasoning', 'text', 'tool']
+      - name: role
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['user', 'assistant', 'tool']
+
+  - name: stg_users
+    description: "End users, one row per user."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: plan
+        description: "free / pro / enterprise."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['free', 'pro', 'enterprise']
+
+  - name: stg_models
+    description: "Reference table of models and per-1k token pricing."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: name
+        data_tests:
+          - not_null
+
+  - name: stg_assistants
+    description: "Configurable AI assistants."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_conversations
+    description: "Conversation threads, optionally tied to an assistant."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: user_id
+        data_tests:
+          - not_null
+      - name: source
+        description: "Channel: web / api / slack / teams."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['web', 'api', 'slack', 'teams']
+
+  - name: stg_usage
+    description: "Per-generation token usage."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: user_id
+        data_tests:
+          - not_null
+      - name: model_id
+        data_tests:
+          - not_null
+
+  - name: stg_feedback
+    description: "Thumbs up/down on assistant messages."
+    columns:
+      - name: id
+        data_tests:
+          - unique
+          - not_null
+      - name: message_id
+        data_tests:
+          - not_null
+      - name: rating
+        description: "1 = thumbs up, -1 = thumbs down."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, -1]
